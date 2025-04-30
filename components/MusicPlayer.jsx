@@ -74,11 +74,11 @@ export default function MusicPlayer() {
         fontFamily: 'sans-serif',
       }}
     >
-      <h1>Reproductor de YouTube</h1>
+      <h1>Canciones que me recuerdan a ti<i class="fa-solid fa-heart"></i></h1>
 
       <div style={{ marginBottom: '20px' }}>
         <YouTube
-          key={videos[currentIndex].videoId} // 👈 fuerza recarga del video
+          key={videos[currentIndex].videoId} 
           videoId={videos[currentIndex].videoId}
           opts={opts}
           onReady={onPlayerReady}
