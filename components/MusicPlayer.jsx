@@ -1,98 +1,99 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
+import YouTube from 'react-youtube';
 
 export default function MusicPlayer() {
-  const [songs, setSongs] = useState([]);
+  const videos = [
+    { title: "Dillom - Cirugia", videoId: "WsvYPRqSH28" },
+    { title: "Twenty one pilots: Tear In My Heart", videoId: "nky4me4NP70" },
+    { title: "MILO J - Tus vueltas", videoId: "SOXYr6CsUJU" },
+    { title: "MILO J - Cuando estas vos", videoId: "p8TSxlxvTMc" },
+    { title: "Tan Biónica - Loca", videoId: "xRaNtoiUkjQ" },
+    { title: "El Cuarteto de Nos -Enamorada tuya", videoId: "R5cbxTPZNL0" },
+    { title: "Tan Biónica - Beautiful", videoId: "icJWvnwZh6U" },
+    { title: "MILO J - Deseo perder", videoId: "-zxlKAR5e2w" },
+    { title: "WOS - Okupa", videoId: "MA5v9VNJ-2Q" },
+    { title: "Tan Biónica - La Melodía de Dios", videoId: "txZw4iMtgJo" },
+    { title: "Indios - Jullie", videoId: "1klKhwAa3jY" },
+    { title: "Charly garcia - Seminare", videoId: "z6uZpam-3Pg" },
+    { title: "Twenty One Pilots -  We Don't Believe What's on tv", videoId: "zZEumf7RowI" },
+  ];
+
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
+  const [player, setPlayer] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-     
-        const mockData = [
-          {
-            id: 1,
-            name: "Mario Castle",
-            url: "https://playground.4geeks.com/sound/files/mario/songs/castle.mp3"
-          },
-          {
-            id: 2,
-            name: "Mario Star",
-            url: "https://playground.4geeks.com/sound/files/mario/songs/hurry-starman.mp3"
-          },
-          {
-            id: 3,
-            name: "Mario Overworld",
-            url: "https://playground.4geeks.com/sound/files/mario/songs/overworld.mp3"
-          },
-          {
-            id: 4,
-            name: "Mario Stage 1",
-            url: "https://playground.4geeks.com/sound/files/mario/songs/stage1.mp3"
-          }
-        ];
-        setSongs(mockData);
+  const opts = {
+    height: '390',
+    width: '640',
+    playerVars: {
+      autoplay: 1,
+    },
+  };
 
-      } catch (error) {
-        console.error('Error al cargar las canciones', error);
-      }
-    };
-
-    fetchSongs();
-  }, []); 
-
-  useEffect(() => {
-    if (songs.length > 0 && audioRef.current) {
-      audioRef.current.src = songs[currentIndex].url;
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
-  }, [currentIndex, songs]);
-
-  const playSong = (index) => setCurrentIndex(index);
-  const playNext = () => setCurrentIndex((i) => (i + 1) % songs.length);
-  const playPrevious = () =>
-    setCurrentIndex((i) => (i - 1 + songs.length) % songs.length);
+  const onPlayerReady = (event) => {
+    setPlayer(event.target);
+    event.target.playVideo();
+  };
 
   const togglePlayPause = () => {
+    if (!player) return;
+
     if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+      player.pauseVideo();
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      player.playVideo();
     }
+
+    setIsPlaying(!isPlaying);
+  };
+
+  const playNext = () => {
+    const nextIndex = (currentIndex + 1) % videos.length;
+    setCurrentIndex(nextIndex);
+    setIsPlaying(true);
+  };
+
+  const playPrevious = () => {
+    const prevIndex = (currentIndex - 1 + videos.length) % videos.length;
+    setCurrentIndex(prevIndex);
+    setIsPlaying(true);
+  };
+
+  const playSong = (index) => {
+    setCurrentIndex(index);
+    setIsPlaying(true);
   };
 
   return (
-    <div style={{ backgroundColor: '#111', color: '#fff', height: '100vh', padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1 style={{ textAlign: 'center' }}>Reproductor de Música</h1>
-      
-      <div style={{ maxHeight: '70%', overflowY: 'auto', marginBottom: '20px' }}>
-        {songs.length === 0 ? (
-          <div>Cargando canciones...</div>
-        ) : (
-          songs.map((song, index) => (
-            <div
-              key={song.id}
-              onClick={() => playSong(index)}
-              style={{
-                padding: '10px',
-                backgroundColor: index === currentIndex ? '#444' : 'transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                borderBottom: '1px solid #333',
-              }}
-            >
-              <span style={{ width: '30px' }}>{index + 1}</span>
-              <span>{song.name}</span>
-            </div>
-          ))
-        )}
+    <div
+      style={{
+        backgroundColor: '#111',
+        color: '#fff',
+        minHeight: '100vh',
+        padding: '20px',
+        fontFamily: 'sans-serif',
+      }}
+    >
+      <h1>Reproductor de YouTube</h1>
+
+      <div style={{ marginBottom: '20px' }}>
+        <YouTube
+          key={videos[currentIndex].videoId} // 👈 fuerza recarga del video
+          videoId={videos[currentIndex].videoId}
+          opts={opts}
+          onReady={onPlayerReady}
+        />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '30px',
+          alignItems: 'center',
+          marginBottom: '20px',
+        }}
+      >
         <button onClick={playPrevious}>
           <i className="fa-solid fa-backward"></i>
         </button>
@@ -104,7 +105,29 @@ export default function MusicPlayer() {
         </button>
       </div>
 
-      <audio ref={audioRef} style={{ display: 'none' }} />
+      <div
+        style={{
+          maxHeight: '300px',
+          overflowY: 'auto',
+          borderTop: '1px solid #444',
+          paddingTop: '10px',
+        }}
+      >
+        {videos.map((video, index) => (
+          <div
+            key={index}
+            onClick={() => playSong(index)}
+            style={{
+              padding: '10px',
+              backgroundColor: index === currentIndex ? '#444' : 'transparent',
+              cursor: 'pointer',
+              borderBottom: '1px solid #333',
+            }}
+          >
+            {index + 1}. {video.title}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
